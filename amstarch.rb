@@ -7,7 +7,7 @@ require 'yaml'
 #CONFIG DETAILS
 config = YAML.load(File.read("config.cfg"))
 inventory_number = config["inventory_number"].to_i
-archive_ref = config["archive_ref"].to_i
+archive_ref = config["archive_ref"].to_s
 archive_abriviation = config["archive_abriviation"].to_s
 
 #setup url

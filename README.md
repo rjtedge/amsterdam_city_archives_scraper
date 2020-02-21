@@ -15,7 +15,7 @@ To intall and set up the script follow the instructions below:
 
 
 ### Windows
-- Download the (RubyInstaller for Windows)[https://github.com/oneclick/rubyinstaller2/releases/download/RubyInstaller-2.6.5-1/rubyinstaller-devkit-2.6.5-1-x64.exe]. 
+- Download the [RubyInstaller for Windows](https://github.com/oneclick/rubyinstaller2/releases/download/RubyInstaller-2.6.5-1/rubyinstaller-devkit-2.6.5-1-x64.exe). 
 - Open the rubyinstaller-devkit-2.6.5-1-x64.exe file and follow the prompts
 - Open CMD by hitting the Windows followed by c m d keys and then hit Enter (You should see a sceen reminicent to a very old DOS computer). 
 - In CMD, type or copy/paste the following and then hit Enter
@@ -29,7 +29,7 @@ ruby -v
 gem install httparty activesupport pp fileutils yaml
 ```
 - You should see some new lines of text and eventually "4 gems installed"
-- Download the (amsterdam_city_archives_scraper script)[https://github.com/rjtedge/amsterdam_city_archives_scraper/archive/master.zip]
+- Download the [amsterdam_city_archives_scraper script](https://github.com/rjtedge/amsterdam_city_archives_scraper/archive/master.zip)
 - Unpack the zip file to a new folder on your computer. 
 - You are now read to get started. 
 

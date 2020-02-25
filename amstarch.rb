@@ -4,12 +4,14 @@ require 'active_support/core_ext/enumerable'
 require 'fileutils'
 require 'yaml'
 
+
+
 #CONFIG DETAILS
 config = YAML.load(File.read("config.cfg"))
 inventory_number = config["inventory_number"].to_i
 archive_ref = config["archive_ref"].to_s
 archive_abriviation = config["archive_abriviation"].to_s
-
+p archive_ref
 #setup url
 urlbase = "https://webservices.picturae.com/archives/scans/"
 key = "?apiKey=eb37e65a-eb47-11e9-b95c-60f81db16c0e"
@@ -17,6 +19,7 @@ key = "?apiKey=eb37e65a-eb47-11e9-b95c-60f81db16c0e"
 #use httparty to get the basic info from the City Archives Site
 response = HTTParty.get(urlbase + inventory_number.to_s + "/" + archive_ref.to_s + key)
 p "Inventory Found"
+p urlbase + inventory_number.to_s + "/" + archive_ref.to_s + key
 #parse the response from the City Archives Site
 parsed = response.parsed_response
 
@@ -48,19 +51,38 @@ end
 directory = inventory_number.to_s + archive_abriviation + archive_ref.to_s.split(".").join("-").to_s + "/"
 FileUtils.mkdir_p directory
 errored = []
-
+def readfile(name,save,n,total)
+    open(name, 'wb' ) do |file|
+        p "Downloading image " + n.to_s + " of " + total 
+        begin 
+            file << HTTParty.get(save)
+            return "good"
+        #if an error occurs with the connection, it will add it to the error array
+        rescue HTTParty::Error
+            return "bad"
+        end
+    end
+end 
 n = 1
 imageurls.each do |save|
     name = inventory_number.to_s + archive_abriviation + archive_ref.to_s.split(".").join("-").to_s + "/" + "CAA" + inventory_number.to_s + archive_abriviation + archive_ref.to_s.split(".").join("-").to_s + "p" + n.to_s + ".jpg"
+    if (File.file?(name) == true) && (File.size(name) < 10)
+        File.delete(name)
+    end
     if File.file?(name) == false
-        open(name, 'wb' ) do |file|
-            p "Downloading image " + n.to_s + " of " + imageurls.count.to_s
-            begin
-                file << HTTParty.get(save)
-            #if an error occurs with the connection, it will add it to the error array
-            rescue HTTParty::Error
-                errored << [save,n]
-            end
+        reqlength = HTTParty.head(save)['content-length'].to_i
+        totalnum = imageurls.count.to_s
+        if readfile(name,save,n,totalnum) == "bad"
+            errored << [save,n]
+        end
+        f = 1
+        if (File.size(name) != reqlength) && (f <=2)
+            p "missmatch file size to request size, trying again"
+            File.delete(name)
+            readfile(name,save,n,totalnum)
+            f += 1
+        elsif (File.size(name) != reqlength) && (f >=2)
+            p "Could not fix missmatch file size to request size" 
         end
     end
     n += 1
@@ -72,7 +94,6 @@ while (errored.empty? == false) && (v <=2)
     p "error fix try " + v.to_s 
     errored.each do |save|
         name = inventory_number.to_s + archive_abriviation + archive_ref.to_s.split(".").join("-").to_s + "/" + "CAA" + inventory_number.to_s + archive_abriviation + archive_ref.to_s.split(".").join("-").to_s + "p" + save[1].to_s + ".jpg"
-        p name
         if File.file?(name) == false
             open(name, 'wb' ) do |file|
                 begin
